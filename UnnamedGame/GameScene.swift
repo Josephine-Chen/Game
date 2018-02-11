@@ -10,6 +10,7 @@ import SpriteKit
 import GameplayKit
 
 class GameScene: SKScene {
+    // MARK: - Properties
     let hero = SKSpriteNode(imageNamed: "p1_front")
     var lastUpdateTime: TimeInterval = 0
     var dt: TimeInterval = 0
@@ -17,6 +18,7 @@ class GameScene: SKScene {
     let cameraMovePointsPerSec: CGFloat = 200.0
     var velocity = CGPoint.zero //2D vector
     let heroRotateRadiansPerSec:CGFloat = 4.0 * π
+    var coinPurse = 0
     
     let playableRect: CGRect //Limit sprite bounds
     var lastTouchLocation = CGPoint.zero
@@ -34,6 +36,12 @@ class GameScene: SKScene {
     //Sounds
     //let coinCollisionSound: SKAction = SKAction.playSoundFileNamed("collectCoin.wav", waitForCompletion: false)
     
+    //HUD
+    let livesLabel = SKLabelNode(fontNamed: "Avenir")
+    let coinsLabel = SKLabelNode(fontNamed: "Avenir")
+    
+    // MARK: - Timing
+    
     override func didMove(to view: SKView) {
         for i in 0...1 {
             let background = backgroundNode()
@@ -43,6 +51,30 @@ class GameScene: SKScene {
             background.name = "background"
             background.zPosition = -1
             addChild(background)
+            
+            livesLabel.text = "Lives: \(lives)"
+            livesLabel.fontColor = SKColor.black
+            livesLabel.fontSize = 100
+            livesLabel.zPosition = 150
+            livesLabel.horizontalAlignmentMode = .left
+            livesLabel.verticalAlignmentMode = .bottom
+            livesLabel.position = CGPoint(
+                x: -playableRect.size.width/2 + CGFloat(20),
+                y: -playableRect.size.height/2 + CGFloat(20))
+            livesLabel.removeFromParent() //Needed or else crashes
+            cameraNode.addChild(livesLabel)
+            
+            coinsLabel.text = "Coins: \(coinPurse)"
+            coinsLabel.fontColor = SKColor.black
+            coinsLabel.fontSize = 100
+            coinsLabel.zPosition = 150
+            coinsLabel.horizontalAlignmentMode = .right
+            coinsLabel.verticalAlignmentMode = .bottom
+            coinsLabel.position = CGPoint(
+                x: playableRect.size.width/2 - CGFloat(20),
+                y: -playableRect.size.height/2 + CGFloat(20))
+            coinsLabel.removeFromParent() //Needed or else crashes
+            cameraNode.addChild(coinsLabel)
         }
         
         //Hero
@@ -50,9 +82,7 @@ class GameScene: SKScene {
         addChild(self.hero)
         
         run(SKAction.repeatForever(
-            SKAction.sequence([SKAction.run() { [weak self] in
-                self?.spawnCoin()
-                },
+            SKAction.sequence([SKAction.run() { [weak self] in self?.spawnCoin()},
                                SKAction.wait(forDuration: 1.0)])))
         addChild(cameraNode)
         camera = cameraNode
@@ -68,8 +98,8 @@ class GameScene: SKScene {
             dt = 0 }
         lastUpdateTime = currentTime
         boundsCheckHero()
-        let offset = CGPoint(x: lastTouchLocation.x - hero.position.x,
-                             y: lastTouchLocation.y - hero.position.y)
+//        let offset = CGPoint(x: lastTouchLocation.x - hero.position.x,
+//                             y: lastTouchLocation.y - hero.position.y)
         //let length = sqrt(Double(offset.x * offset.x + offset.y * offset.y))
         /*
          if let lastTouchLocation = lastTouchLocation {
@@ -91,7 +121,8 @@ class GameScene: SKScene {
             print("You lose!")
         }
          moveCamera()
-
+        coinsLabel.text = "Coins: \(coinPurse)"
+        livesLabel.text = "Lives: \(lives)"
     }
     
     override func didEvaluateActions() {
@@ -224,6 +255,8 @@ class GameScene: SKScene {
     
     // MARK: - Collision
     func heroCollect(coin: SKSpriteNode) {
+        coinPurse += 1
+        print("COINS: \(coinPurse)")
         coin.removeFromParent()
         //For sound
         //run(coinCollisionSound)

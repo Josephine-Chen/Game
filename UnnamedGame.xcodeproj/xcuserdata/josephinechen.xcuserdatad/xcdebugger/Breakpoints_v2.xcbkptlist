@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "UnnamedGame/AppDelegate.swift"
+            timestampString = "540012203.179901"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "5"
+            endingLineNumber = "5"
+            landmarkName = "unknown"
+            landmarkType = "0">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "UnnamedGame.AppDelegate.__deallocating_deinit"
+                  moduleName = "UnnamedGame"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/josephinechen/Desktop/Projects/UnnamedGame/UnnamedGame/AppDelegate.swift"
+                  timestampString = "540010886.9339761"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0"
+                  offsetFromSymbolStart = "4">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "UnnamedGame.AppDelegate.__allocating_init() -&gt; UnnamedGame.AppDelegate"
+                  moduleName = "UnnamedGame"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/josephinechen/Desktop/Projects/UnnamedGame/UnnamedGame/AppDelegate.swift"
+                  timestampString = "540010886.936384"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0"
+                  offsetFromSymbolStart = "4">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "UnnamedGame.AppDelegate.init() -&gt; UnnamedGame.AppDelegate"
+                  moduleName = "UnnamedGame"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/josephinechen/Desktop/Projects/UnnamedGame/UnnamedGame/AppDelegate.swift"
+                  timestampString = "540010886.9393491"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "14"
+                  endingLineNumber = "14"
+                  offsetFromSymbolStart = "24">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "main"
+                  moduleName = "UnnamedGame"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/josephinechen/Desktop/Projects/UnnamedGame/UnnamedGame/AppDelegate.swift"
+                  timestampString = "540010886.942814"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "12"
+                  endingLineNumber = "12"
+                  offsetFromSymbolStart = "4">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>
