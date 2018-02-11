@@ -14,22 +14,36 @@ class GameScene: SKScene {
     var lastUpdateTime: TimeInterval = 0
     var dt: TimeInterval = 0
     let heroMovePointsPerSec: CGFloat = 480.0
+    let cameraMovePointsPerSec: CGFloat = 200.0
     var velocity = CGPoint.zero //2D vector
+    let heroRotateRadiansPerSec:CGFloat = 4.0 * π
     
     let playableRect: CGRect //Limit sprite bounds
     var lastTouchLocation = CGPoint.zero
     
+    //Camera
+    let cameraNode = SKCameraNode()
+    
+    //Gameplay
+    var lives = 3 //Start at 3, increase as collect more coins
+    var gameOver = false
+    
+    //Animation
     let heroAnimation: SKAction
     
+    //Sounds
+    //let coinCollisionSound: SKAction = SKAction.playSoundFileNamed("collectCoin.wav", waitForCompletion: false)
     
     override func didMove(to view: SKView) {
-        backgroundColor = SKColor.black
-        let background = SKSpriteNode(imageNamed: "bg")
-        background.position = CGPoint(x: size.width/2, y: size.height/2)
-        background.size.height = self.size.height
-        background.size.width = self.size.width
-        background.zPosition = -1
-        addChild(background)
+        for i in 0...1 {
+            let background = backgroundNode()
+            background.anchorPoint = CGPoint.zero
+            background.position =
+                CGPoint(x: CGFloat(i)*background.size.width, y: 0)
+            background.name = "background"
+            background.zPosition = -1
+            addChild(background)
+        }
         
         //Hero
         self.hero.position = CGPoint(x: 400, y: 400)
@@ -40,7 +54,10 @@ class GameScene: SKScene {
                 self?.spawnCoin()
                 },
                                SKAction.wait(forDuration: 1.0)])))
-        //hero.run(SKAction.repeatForever(heroAnimation))
+        addChild(cameraNode)
+        camera = cameraNode
+        cameraNode.position = CGPoint(x: size.width/2, y: size.height/2)
+        
         //debugDrawPlayableArea()
     }
     
@@ -53,15 +70,31 @@ class GameScene: SKScene {
         boundsCheckHero()
         let offset = CGPoint(x: lastTouchLocation.x - hero.position.x,
                              y: lastTouchLocation.y - hero.position.y)
-        let length = sqrt(Double(offset.x * offset.x + offset.y * offset.y))
-        if length <= Double(heroMovePointsPerSec * CGFloat(dt)) {
-            hero.position = lastTouchLocation
-            velocity = CGPoint.zero
-            stopHeroAnimation()
-        } else {
-            move(sprite: hero, velocity: velocity)
-            rotate(sprite: hero, direction: velocity)
+        //let length = sqrt(Double(offset.x * offset.x + offset.y * offset.y))
+        /*
+         if let lastTouchLocation = lastTouchLocation {
+         let diff = lastTouchLocation - hero.position
+         if diff.length() <= heroMovePointsPerSec * CGFloat(dt) {
+         hero.position = lastTouchLocation
+         velocity = CGPoint.zero
+         stopHeroAnimation()
+         } else {
+         */
+        move(sprite: hero, velocity: velocity)
+        rotate(sprite: hero, direction: velocity,
+               rotateRadiansPerSec: heroRotateRadiansPerSec)
+        /*} }*/
+        
+        //Gameplay loop
+        if lives <= 0 && !gameOver {
+            gameOver = true
+            print("You lose!")
         }
+         moveCamera()
+
+    }
+    
+    override func didEvaluateActions() {
         checkCollisions()
     }
     
@@ -131,11 +164,11 @@ class GameScene: SKScene {
     }
     
     func boundsCheckHero() {
-        let bottomLeft = CGPoint(x: 0, y: playableRect.minY)
-        let topRight = CGPoint(x: size.width, y: playableRect.maxY)
+        let bottomLeft = CGPoint(x: cameraRect.minX, y: cameraRect.minY)
+        let topRight = CGPoint(x: cameraRect.maxX, y: cameraRect.maxY)
         if hero.position.x <= bottomLeft.x {
             hero.position.x = bottomLeft.x
-            velocity.x = -velocity.x
+            velocity.x = abs(velocity.x)
         }
         if hero.position.x >= topRight.x {
             hero.position.x = topRight.x
@@ -151,9 +184,11 @@ class GameScene: SKScene {
         }
     }
     
-    func rotate(sprite: SKSpriteNode, direction: CGPoint) {
-        sprite.zRotation = CGFloat(
-            atan2(Double(direction.y), Double(direction.x)))
+    func rotate(sprite: SKSpriteNode, direction: CGPoint,
+                rotateRadiansPerSec: CGFloat) {
+        let shortest = shortestAngleBetween(angle1: sprite.zRotation, angle2: velocity.angle)
+        let amountToRotate = min(rotateRadiansPerSec * CGFloat(dt), abs(shortest))
+        sprite.zRotation += shortest.sign() * amountToRotate
     }
     
     
@@ -172,10 +207,11 @@ class GameScene: SKScene {
         let coin = SKSpriteNode(imageNamed: "coinGold")
         coin.name = "coin"
         coin.position = CGPoint(
-            x: CGFloat.random(min: playableRect.minX,
-                              max: playableRect.maxX),
-            y: CGFloat.random(min: playableRect.minY,
-                              max: playableRect.maxY))
+            x: CGFloat.random(min: cameraRect.minX,
+                              max: cameraRect.maxX),
+            y: CGFloat.random(min: cameraRect.minY,
+                max: cameraRect.maxY))
+        coin.zPosition = 50
         coin.setScale(0)
         addChild(coin)
         let appear = SKAction.scale(to: 1.0, duration: 0.5)
@@ -189,6 +225,8 @@ class GameScene: SKScene {
     // MARK: - Collision
     func heroCollect(coin: SKSpriteNode) {
         coin.removeFromParent()
+        //For sound
+        //run(coinCollisionSound)
     }
     
     func checkCollisions() {
@@ -204,6 +242,63 @@ class GameScene: SKScene {
         }
     }
     
+    
+    // MARK: - Camera and Background Scroll
+    func backgroundNode() -> SKSpriteNode {
+        //Create a node with no texture
+        let backgroundNode = SKSpriteNode()
+        backgroundNode.anchorPoint = CGPoint.zero
+        backgroundNode.name = "bg"
+        //Then append background to node
+        let background1 = SKSpriteNode(imageNamed: "bg")
+        background1.anchorPoint = CGPoint.zero
+        background1.position = CGPoint(x: 0, y: 0)
+        background1.size.width = self.size.width
+        background1.size.height = self.size.height
+        backgroundNode.addChild(background1)
+        //Then append other background to node
+        let background2 = SKSpriteNode(imageNamed: "bg")
+        background2.anchorPoint = CGPoint.zero
+        background2.position =
+            CGPoint(x: background1.size.width, y: 0)
+        background2.size.width = self.size.width
+        background2.size.height = self.size.height
+        backgroundNode.addChild(background2)
+        //Set size based on provided backgrounds
+        backgroundNode.size = CGSize(
+            width: background1.size.width + background2.size.width,
+            height: background1.size.height)
+        return backgroundNode
+    }
+    
+    func moveCamera() {
+        let backgroundVelocity =
+            CGPoint(x: cameraMovePointsPerSec, y: 0)
+        let amountToMove = backgroundVelocity * CGFloat(dt)
+        cameraNode.position += amountToMove
+        
+        enumerateChildNodes(withName: "background") { node, _ in
+            let background = node as! SKSpriteNode
+            if background.position.x + background.size.width <
+                self.cameraRect.origin.x {
+                background.position = CGPoint(
+                    x: background.position.x + background.size.width*2,
+                    y: background.position.y)
+            }
+        }
+    }
+    
+    var cameraRect : CGRect {
+        let x = cameraNode.position.x - size.width/2
+            + (size.width - playableRect.width)/2
+        let y = cameraNode.position.y - size.height/2
+            + (size.height - playableRect.height)/2
+        return CGRect(
+            x: x,
+            y: y,
+            width: playableRect.width,
+            height: playableRect.height)
+    }
     
     // MARK: - Debug
     func debugDrawPlayableArea() {
