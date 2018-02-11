@@ -148,11 +148,17 @@ class GameScene: SKScene {
         textures.append(textures[1])
         heroAnimation = SKAction.animate(with: textures,
                                            timePerFrame: 0.1)
+        
         super.init(size: size)
+        addObservers()
     }
     
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     func move(sprite: SKSpriteNode, velocity: CGPoint) {
@@ -440,4 +446,29 @@ class GameScene: SKScene {
 //
 //        self.lastUpdateTime = currentTime
 //    }
+}
+
+// MARK: - Notifications
+extension GameScene {
+    func addObservers() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(applicationDidBecomeActive),
+                                               name: .UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(applicationWillResignActive),
+                                               name: .UIApplicationWillResignActive, object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(applicationDidEnterBackground),
+                                               name: .UIApplicationDidEnterBackground, object: nil)
+    }
+    //Debug
+    @objc func applicationDidBecomeActive() {
+        print("* applicationDidBecomeActive")
+    }
+    @objc func applicationWillResignActive() {
+        print("* applicationWillResignActive")
+    }
+    @objc func applicationDidEnterBackground() {
+        print("* applicationDidEnterBackground")
+    }
 }
