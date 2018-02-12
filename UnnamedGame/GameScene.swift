@@ -39,6 +39,7 @@ class GameScene: SKScene {
     //HUD
     let livesLabel = SKLabelNode(fontNamed: "Avenir")
     let coinsLabel = SKLabelNode(fontNamed: "Avenir")
+    let coinHUD = SKSpriteNode(imageNamed: "coinGold")
     
     // MARK: - Timing
     
@@ -64,7 +65,7 @@ class GameScene: SKScene {
             livesLabel.removeFromParent() //Needed or else crashes
             cameraNode.addChild(livesLabel)
             
-            coinsLabel.text = "Coins: \(coinPurse)"
+            coinsLabel.text = "\(coinPurse)"
             coinsLabel.fontColor = SKColor.black
             coinsLabel.fontSize = 100
             coinsLabel.zPosition = 150
@@ -75,6 +76,12 @@ class GameScene: SKScene {
                 y: -playableRect.size.height/2 + CGFloat(20))
             coinsLabel.removeFromParent() //Needed or else crashes
             cameraNode.addChild(coinsLabel)
+            
+            coinHUD.position = CGPoint(x: playableRect.size.width/2 - CGFloat(200),
+                                       y: -playableRect.size.height/2 + coinHUD.frame.height/3)
+            coinHUD.setScale(3.0)
+            coinHUD.removeFromParent()
+            cameraNode.addChild(coinHUD)
         }
         
         //Hero
@@ -121,7 +128,10 @@ class GameScene: SKScene {
             print("You lose!")
         }
          moveCamera()
-        coinsLabel.text = "Coins: \(coinPurse)"
+        coinsLabel.text = "\(coinPurse)"
+
+        coinHUD.position = CGPoint(x: playableRect.size.width/2 - CGFloat(100) - CGFloat(50*String(coinPurse).count),
+                                   y: -playableRect.size.height/2 + coinHUD.frame.height/3)
         livesLabel.text = "Lives: \(lives)"
     }
     
@@ -262,7 +272,6 @@ class GameScene: SKScene {
     // MARK: - Collision
     func heroCollect(coin: SKSpriteNode) {
         coinPurse += 1
-        print("COINS: \(coinPurse)")
         coin.removeFromParent()
         //For sound
         //run(coinCollisionSound)
@@ -289,14 +298,14 @@ class GameScene: SKScene {
         backgroundNode.anchorPoint = CGPoint.zero
         backgroundNode.name = "bg"
         //Then append background to node
-        let background1 = SKSpriteNode(imageNamed: "bg")
+        let background1 = SKSpriteNode(imageNamed: "bg_grasslands")
         background1.anchorPoint = CGPoint.zero
         background1.position = CGPoint(x: 0, y: 0)
         background1.size.width = self.size.width
         background1.size.height = self.size.height
         backgroundNode.addChild(background1)
         //Then append other background to node
-        let background2 = SKSpriteNode(imageNamed: "bg")
+        let background2 = SKSpriteNode(imageNamed: "bg_grasslands")
         background2.anchorPoint = CGPoint.zero
         background2.position =
             CGPoint(x: background1.size.width, y: 0)
@@ -338,6 +347,7 @@ class GameScene: SKScene {
             width: playableRect.width,
             height: playableRect.height)
     }
+    
     
     // MARK: - Debug
     func debugDrawPlayableArea() {
